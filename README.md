@@ -3,7 +3,7 @@
 1.1 OBJECTIVE
 
 Launch a simple web site in a load balanced and highly available manner utilizing automation
-and AWS bestpractices
+and AWS bestpractices.
 
 
 1.2 REQUIREMENTS
