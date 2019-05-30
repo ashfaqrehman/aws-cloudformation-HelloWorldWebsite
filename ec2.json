@@ -11,6 +11,12 @@
       "MaxLength" : 255,
       "AllowedPattern" : "^[a-zA-Z][-a-zA-Z0-9]*$",
       "Default" : "SampleNetworkCrossStack"
+    },
+    "KeyName":{
+    "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+    "Type": "AWS::EC2::KeyPair::KeyName",
+    "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
+    "Default": "OnicaTest"
     }
   },
 
@@ -46,27 +52,33 @@
               }
             },
 
-            "files" : {
-              "/var/www/html/index.html" : {
-                "content" : { "Fn::Join" : ["\n", [
-                  "<img src=\"https://s3.amazonaws.com/cloudformation-examples/cloudformation_graphic.png\" alt=\"AWS CloudFormation Logo\"/>",
-                  "<h1>Congratulations, you have successfully launched the AWS CloudFormation sample.</h1>"
-                ]]},
-                "mode"    : "000644",
-                "owner"   : "root",
-                "group"   : "root"
-              }
-            },
-
             "services" : {
               "sysvinit" : {
                 "httpd"    : { "enabled" : "true", "ensureRunning" : "true" }
+              }
+            },
+            
+            "commands" : {
+              "test" : {
+                  "command" : "hostname > /var/www/html/index.html",
+                  "env" : { "MAGIC" : "$(hostname) " },
+                  "cwd" : "~",
+                  "test" : "test ! -e /var/www/html/index.html",
+                  "ignoreErrors" : "false"
+              },
+              "test2" : {
+                  "command" : "echo \"$MAGIC2\" > test2.txt",
+                  "env" : { "MAGIC2" : "I come from the environment!" },
+                  "cwd" : "~",
+                  "test" : "test ! -e ~/test2.txt",
+                  "ignoreErrors" : "false"
               }
             }
           }
         }
       },
       "Properties": {
+        "KeyName" : { "Ref" : "KeyName" },
         "InstanceType"   : "t2.micro",
         "ImageId": { "Fn::FindInMap": [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" } , "HVM64" ] },
         "NetworkInterfaces" : [{
