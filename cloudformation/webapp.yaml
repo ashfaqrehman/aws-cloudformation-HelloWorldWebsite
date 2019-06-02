@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: This template provisions 
-  a multi-az, load balanced and Auto Scaled sample web site running on an Apache
-  Web Server. 
+Description: This template provisions
+- Multi-az(2 AZs) ELB inside public subnets
+- Multi-az(2 AZs) Auto Scaling Group with EC2 instances (min=2, max=3) inside private subnets
+- Security Group allowing HTTP traffic to load balancer from anywhere
+- Security Group allowing only HTTP traffic from the load balancer to the instance(s)
+- Launch Configuration with "Hello World" HTML web site running on an Apache Web Server and includes the server’s hostname. 
+- Outputs Load Balancer URL 
 Parameters:
   NetworkStackName:
     Description: Name of an active CloudFormation stack that contain VPC, public and private subnets, that will be used in this stack.     
@@ -178,9 +182,6 @@ Resources:
       AutoScalingGroupName: !Ref AutoScalingGroup
       Cooldown: '60'
       ScalingAdjustment: '1'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 5a729a7c-98f0-4f59-b710-0687742a46ac
   WebServerScaleDownPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:
@@ -188,9 +189,6 @@ Resources:
       AutoScalingGroupName: !Ref AutoScalingGroup
       Cooldown: '60'
       ScalingAdjustment: '-1'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 57249b4f-dfb8-42a5-8034-690efdaec535
   CPUAlarmHigh:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -207,9 +205,6 @@ Resources:
         - Name: AutoScalingGroupName
           Value: !Ref AutoScalingGroup
       ComparisonOperator: GreaterThanThreshold
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: d63bf71f-35f6-4fd4-ac44-17500c77e57b
   CPUAlarmLow:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
