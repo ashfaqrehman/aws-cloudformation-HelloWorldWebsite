@@ -29,3 +29,13 @@ o Can be sourced from the location of your choice (S3, cookbook file/ template, 
 o Must include the server’s hostname in the “hello world” presented to the user
 - All AWS resources must be created using Terraform or CloudFormation
 - No resources may be created or managed by hand other than EC2 SSH keys
+
+1.3 SOLUTION
+- Review code in each CloudFormation YAML file
+ o [webapp.yaml, vpc.yaml ]
+- Review code in each CloudFormation Bash script
+[ vpc.sh, webapp.sh, testScaleUpPolicy.sh, testScaleDownPolicy.sh ]
+- Run each Bash script in the following succession
+vpc.sh → webapp.sh → testScaleUpPolicy.sh → testScaleDownPolicy.sh
+- After each Bash script is run, review the results in the CloudFormation console, and in each respective console, i.e. EC2, ELB, etc.
+- Delete each CloudFormation stack via the console
