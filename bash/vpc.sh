@@ -5,7 +5,8 @@ profile="default"
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-aws cloudformation create-stack \
+#aws cloudformation create-stack \
+aws cloudformation update-stack \
     --stack-name AshfaqRehman-VPC \
     --template-body file://${dir}/../cloudformation/vpc.yaml \
     --parameters \
