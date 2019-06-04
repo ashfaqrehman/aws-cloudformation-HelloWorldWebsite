@@ -1,22 +1,22 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: This template provisions
-- Multi-az(2 AZs) ELB inside public subnets
-- Multi-az(2 AZs) Auto Scaling Group with EC2 instances (min=2, max=3) inside private subnets
-- Security Group allowing HTTP traffic to load balancer from anywhere
-- Security Group allowing only HTTP traffic from the load balancer to the instance(s)
-- Launch Configuration with "Hello World" HTML web site running on an Apache Web Server and includes the server’s hostname. 
-- Outputs Load Balancer URL 
+  - Multi-az(2 AZs) ELB inside public subnets
+  - Multi-az(2 AZs) Auto Scaling Group with EC2 instances (min=2, max=3) inside private subnets
+  - Security Group allowing HTTP traffic to load balancer from anywhere
+  - Security Group allowing only HTTP traffic from the load balancer to the instance(s)
+  - Launch Configuration with "Hello World" HTML web site running on an Apache Web Server and includes the server’s hostname.
+  - Outputs Load Balancer URL
 Parameters:
   NetworkStackName:
-    Description: Name of an active CloudFormation stack that contain VPC, public and private subnets, that will be used in this stack.     
+    Description: Name of an active CloudFormation stack that contain VPC, public and private subnets, that will be used in this stack.
     Type: String
     MinLength: 1
     MaxLength: 255
-    AllowedPattern: '^[a-zA-Z][-a-zA-Z0-9]*$'     
+    AllowedPattern: '^[a-zA-Z][-a-zA-Z0-9]*$'
   KeyName:
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: 'AWS::EC2::KeyPair::KeyName'
-    ConstraintDescription: must be the name of an existing EC2 KeyPair.  
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
   SSHLocation:
     Description: The IP address range that can be used to SSH to the EC2 instances
     Type: String
@@ -60,7 +60,7 @@ Resources:
           FromPort: 80
           IpProtocol: tcp
           ToPort: 80
-      VpcId: !ImportValue 
+      VpcId: !ImportValue
         'Fn::Sub': '${NetworkStackName}-VPCID'
   ELB:
     Type: 'AWS::ElasticLoadBalancing::LoadBalancer'
@@ -84,12 +84,12 @@ Resources:
       Scheme: internet-facing
       SecurityGroups:
         - !Ref ELBSecurityGroup
-      Subnets: 
+      Subnets:
         Fn::Split: # Split to get a list of strings
           - ","
           - Fn::ImportValue: # Use full function name
               !Sub "${NetworkStackName}-PublicSubnets" # Substitute parameter
-        
+
   EC2SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -98,7 +98,7 @@ Resources:
         - IpProtocol: '-1'
           CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
-        - CidrIp: !Ref SSHLocation          
+        - CidrIp: !Ref SSHLocation
           FromPort: 22
           IpProtocol: tcp
           ToPort: 22
@@ -106,21 +106,21 @@ Resources:
           IpProtocol: tcp
           SourceSecurityGroupId: !Ref ELBSecurityGroup
           ToPort: 80
-      VpcId: !ImportValue 
+      VpcId: !ImportValue
         'Fn::Sub': '${NetworkStackName}-VPCID'
   LaunchConfiguration:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
-    Properties:    
+    Properties:
       KeyName: !Ref KeyName
       AssociatePublicIpAddress: true
-      ImageId: !FindInMap 
+      ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
         - AMI
       InstanceType: t2.micro
       SecurityGroups:
         - !Ref EC2SecurityGroup
-      UserData: !Base64 
+      UserData: !Base64
         'Fn::Join':
           - ''
           - - '#!/bin/bash -ex'
@@ -221,13 +221,13 @@ Resources:
         - Name: AutoScalingGroupName
           Value: !Ref AutoScalingGroup
       ComparisonOperator: LessThanThreshold
-    
+
 Outputs:
   ELB:
-    Value: !Join 
+    Value: !Join
       - ''
       - - 'http://'
-        - !GetAtt 
+        - !GetAtt
           - ELB
           - DNSName
     Description: Load Balancer URL
