@@ -197,12 +197,6 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
-  DMZIngressSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: "dmz-ingress-sg"
-      GroupDescription: "DMZ security group"
-      VpcId: !Ref VPC
 
 Outputs:
   VPC:
@@ -246,7 +240,3 @@ Outputs:
     Value: !Ref PrivateSubnet2
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSubnet2'
-
-  DMZIngressSecurityGroup:
-    Description: Security group with no ingress rule
-    Value: !Ref DMZIngressSecurityGroup
